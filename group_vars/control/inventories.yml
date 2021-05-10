@@ -102,7 +102,7 @@ tower_inventory_sources:
     source: ec2
     source_vars:
       regions:
-        - us-east-1
+        - "{{ workshop_ec2_region }}"
       filters:
         tag:ContentView: CentOS7
         tag:Environment: Dev
@@ -193,7 +193,7 @@ tower_inventory_sources:
     source: ec2
     source_vars:
       regions:
-        - us-east-1
+        - "{{ workshop_ec2_region }}"
       filters:
         tag:ContentView: RHEL7
         tag:Environment: Dev
