@@ -46,3 +46,4 @@
         #tower_password: "{{ lookup('env', 'AWX_HOST') }}"
         tower_host: "{{ lookup('env', 'AWX_HOST') }}"
         #tower_verify_ssl: false
+        update_secrets: no
