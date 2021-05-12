@@ -39,12 +39,12 @@
         name: "Tower Credential"
         organization: Default
         credential_type: "Ansible Tower"
-        inputs:
+        #inputs:
           #host: "{{ ansible_host }}"
           #username: admin
           #password: "{{admin_password}}"
-          tower_username: admin
+        tower_username: admin
           #tower_password: "{{ lookup('env', 'AWX_HOST') }}"
-          tower_host: "{{ lookup('env', 'AWX_HOST') }}"
-          tower_verify_ssl: false
+        tower_host: "{{ lookup('env', 'AWX_HOST') }}"
+        tower_verify_ssl: false
         update_secrets: no
