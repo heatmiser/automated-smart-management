@@ -36,14 +36,15 @@
 
     - name: update tower credential for ansible tower
       awx.awx.tower_credential:
-        host: "{{ ansible_host }}"
-        #username: admin
-        #password: "{{admin_password}}"
-        name: "Tower Credential"
-        kind: tower
-        organization: Default
-        #tower_username: admin
-        #tower_password: "{{ lookup('env', 'AWX_HOST') }}"
-        tower_host: "{{ lookup('env', 'AWX_HOST') }}"
-        #tower_verify_ssl: false
-        update_secrets: no
+        inputs:
+          host: "{{ ansible_host }}"
+          #username: admin
+          #password: "{{admin_password}}"
+          name: "Tower Credential"
+          credential_type: tower
+          organization: Default
+          tower_username: admin
+          #tower_password: "{{ lookup('env', 'AWX_HOST') }}"
+          tower_host: "{{ lookup('env', 'AWX_HOST') }}"
+          tower_verify_ssl: false
+          update_secrets: no
