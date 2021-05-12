@@ -38,7 +38,7 @@
       awx.awx.tower_credential:
         name: "Tower Credential"
         organization: Default
-        credential_type: tower
+        credential_type: "Ansible Tower"
         inputs:
           #host: "{{ ansible_host }}"
           #username: admin
