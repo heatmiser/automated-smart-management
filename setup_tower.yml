@@ -34,6 +34,9 @@
       loop_control:
         loop_var: tower_infra_vars
 
+    - debug:
+        msg: "IP: {{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}"
+
     - name: update tower credential for ansible tower
       awx.awx.tower_credential:
         name: "Tower Credential"
