@@ -6,3 +6,6 @@ collections:
   - amazon.aws
   - redhat_cop.tower_configuration
   #https://github.com/theforeman/foreman-ansible-modules
+  - name: awx.awx
+    version: 19.1.0
+    source: https://galaxy.ansible.com
