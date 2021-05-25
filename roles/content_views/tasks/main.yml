@@ -5,7 +5,7 @@
   loop_control:
     loop_var: content
 
-- name: "Ensure content view version is in all environments"
+- name: "Publish lifecyle environments for content view"
   include: cv_subtask.yml
   loop: "{{ foreman_content_views }}"
   loop_control:
