@@ -1,5 +1,5 @@
 ---
-- hosts: "env_{{ server_type }}"
+- hosts: "env_{{ lifecycle_stage }}"
   become: yes
   vars:
     check_only: yes
@@ -16,6 +16,10 @@
       exclude: kernel*
     check_mode: "{{ check_only }}"
     register: updates
+
+  - name: output updates dictionary
+    debug:
+      msg: "{{ updates }}"
     
   - name: updated package list
     debug:
@@ -23,3 +27,4 @@
     loop: "{{ updates.changes.updated }}"
     loop_control:
       label: "{{ item[0] }}"
+    when: updates.changes is defined
