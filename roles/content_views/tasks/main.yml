@@ -7,7 +7,7 @@
 
 - name: "Ensure content view version is in all environments"
   include: cv_subtask.yml
-  loop: "{{ default([]) + [foreman_content_views | first] }}"
+  with_items: "{{ foreman_content_views | first }}"
   loop_control:
     index_var: cv_idx
   when:
