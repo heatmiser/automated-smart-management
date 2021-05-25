@@ -5,9 +5,9 @@ foreman_content_views:
     content_view: RHEL7
     content_view_update: true
     lifecycle_environments:
-      - "RHEL7_Prod"
-      - "RHEL7_QA"
       - "RHEL7_Dev"
+      - "RHEL7_QA"
+      - "RHEL7_Prod"
     repos:
     - name: Red Hat Enterprise Linux 7 Server (RPMs)
       basearch: x86_64
