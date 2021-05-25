@@ -1,5 +1,5 @@
 ---
-- name: "Ensure content view version is in all environments"
+- name: "Ensure content view {{ item.content_view }} version {{ item.content_view_update | d(false) | ternary(omit, 1.0) }} is in all environments"
   theforeman.foreman.content_view_version:
     username: "{{ username | default(omit) }}"
     password: "{{ password | default(omit) }}"
@@ -13,7 +13,7 @@
   poll: 0
   register: publish_async
 
-- name: Check if content view  is finished
+- name: Check if content view {{ item.content_view }} version {{ item.content_view_update | d(false) | ternary(omit, 1.0) }} publish job is finished
   async_status:
     jid: "{{ publish_async.ansible_job_id }}"
   register: job_result
