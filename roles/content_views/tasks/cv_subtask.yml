@@ -22,4 +22,4 @@
     retries: "{{ ( publish_timeout / publish_retry_interval ) | int }}"
     delay: "{{ publish_retry_interval }}"
   
-  when: item.lifecycle_environments[cv_idx] == 0 
+  when: cv_idx == 0 
