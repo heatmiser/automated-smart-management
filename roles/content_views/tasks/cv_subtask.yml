@@ -1,25 +1,22 @@
 ---
-- block:
-  - name: "Ensure content view {{ item.content_view }} lifecycle environment {{ item.lifecycle_environments[cv_idx] }} is in all environments"
-    theforeman.foreman.content_view_version:
-      username: "{{ username | default(omit) }}"
-      password: "{{ password | default(omit) }}"
-      server_url: "{{ server_url | default(omit) }}"
-      validate_certs: "{{ validate_certs | default(omit) }}"
-      content_view: "{{ item.content_view }}"
-      organization: "{{ organization }}"
-      version: "{{ item.content_view_update | d(false) | ternary(omit, 1.0) }}"
-      lifecycle_environments: "{{ item.lifecycle_environments }}"
-    async: "{{ publish_timeout }}"
-    poll: 0
-    register: publish_async
+- name: "Publish lifecyle environments for content view {{ item.content_view }}"
+  theforeman.foreman.content_view_version:
+    username: "{{ username | default(omit) }}"
+    password: "{{ password | default(omit) }}"
+    server_url: "{{ server_url | default(omit) }}"
+    validate_certs: "{{ validate_certs | default(omit) }}"
+    content_view: "{{ item.content_view }}"
+    organization: "{{ organization }}"
+    version: "{{ item.content_view_update | d(false) | ternary(omit, 1.0) }}"
+    lifecycle_environments: "{{ item.lifecycle_environments | first }}"
+  async: "{{ publish_timeout }}"
+  poll: 0
+  register: publish_async
 
-  - name: Check if content view {{ item.content_view }} lifecycle environment {{ item.lifecycle_environments[cv_idx] }} publish job is finished
-    async_status:
-      jid: "{{ publish_async.ansible_job_id }}"
-    register: job_result
-    until: job_result.finished
-    retries: "{{ ( publish_timeout / publish_retry_interval ) | int }}"
-    delay: "{{ publish_retry_interval }}"
-  
-  when: cv_idx == 0 
+- name: Check if lifecyle environments publish job is complete for content view {{ item.content_view }}
+  async_status:
+    jid: "{{ publish_async.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: "{{ ( publish_timeout / publish_retry_interval ) | int }}"
+  delay: "{{ publish_retry_interval }}"
