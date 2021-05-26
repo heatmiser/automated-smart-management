@@ -115,6 +115,7 @@ options:
     description:
       - Additional compute resource specific attributes.
       - When this parameter is set, the module will not be idempotent.
+      - When you provide a I(cluster) here and I(compute_resource) is set, the cluster id will be automatically looked up.
     type: dict
     required: false
   interfaces_attributes:
@@ -203,6 +204,7 @@ options:
         type: str
         choices:
           - 'IPMI'
+          - 'Redfish'
           - 'SSH'
       virtual:
         description:
@@ -251,6 +253,8 @@ options:
         description:
           - Additional compute resource specific attributes for the interface.
           - When this parameter is set, the module will not be idempotent.
+          - When you provide a I(network) here and I(compute_resource) is set, the network id will be automatically looked up.
+          - On oVirt/RHV I(cluster) is required in the hosts I(compute_attributes) for the lookup to work.
         type: dict
 extends_documentation_fragment:
   - theforeman.foreman.foreman
@@ -474,15 +478,39 @@ def main():
         elif 'owner_group' in module.foreman_params:
             module.foreman_params['owner_type'] = 'Usergroup'
 
-        if 'interfaces_attributes' in module.foreman_params:
-            filtered = [nic for nic in ({k: v for k, v in obj.items() if v} for obj in module.foreman_params['interfaces_attributes']) if nic]
-            module.foreman_params['interfaces_attributes'] = filtered
-
     with module.api_connection():
         entity = module.lookup_entity('entity')
 
         if not module.desired_absent:
             module.auto_lookup_entities()
+
+        if 'image' in module.foreman_params:
+            if 'compute_attributes' not in module.foreman_params:
+                module.foreman_params['compute_attributes'] = {}
+            module.foreman_params['compute_attributes']['image_id'] = module.foreman_params['image']['uuid']
+
+        if 'compute_resource' in module.foreman_params:
+            compute_resource = module.foreman_params['compute_resource']
+            cluster = None
+            if 'compute_attributes' in module.foreman_params:
+                if 'cluster' in module.foreman_params['compute_attributes']:
+                    cluster = module.find_cluster(module.foreman_params['compute_attributes']['cluster'], compute_resource)
+                    module.foreman_params['compute_attributes']['cluster'] = cluster['_api_identifier']
+
+                if 'volumes_attributes' in module.foreman_params['compute_attributes']:
+                    for volume in module.foreman_params['compute_attributes']['volumes_attributes'].values():
+                        if 'storage_pod' in volume:
+                            storage_pod = module.find_storage_pod(volume['storage_pod'], compute_resource, cluster)
+                            volume['storage_pod'] = storage_pod['id']
+                        if 'storage_domain' in volume:
+                            storage_domain = module.find_storage_domain(volume['storage_domain'], compute_resource, cluster)
+                            volume['storage_domain'] = storage_domain['id']
+
+            if 'interfaces_attributes' in module.foreman_params:
+                for interface in module.foreman_params['interfaces_attributes']:
+                    if 'compute_attributes' in interface and 'network' in interface['compute_attributes']:
+                        network = module.find_network(interface['compute_attributes']['network'], compute_resource, cluster)
+                        interface['compute_attributes']['network'] = network['id']
 
         # We use different APIs for creating a host with interfaces
         # and updating it, so let's differentiate based on entity being present or not

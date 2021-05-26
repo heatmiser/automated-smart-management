@@ -56,6 +56,7 @@ parameter_foreman_spec = dict(
 parameter_ansible_spec = {k: v for (k, v) in parameter_foreman_spec.items() if k != 'id'}
 
 _PLUGIN_RESOURCES = {
+    'ansible': 'ansible_roles',
     'discovery': 'discovery_rules',
     'katello': 'subscriptions',
     'openscap': 'scap_contents',
@@ -300,7 +301,7 @@ class HostMixin(ParametersMixin):
             kickstart_repository=dict(type='entity', scope=['organization'], optional_scope=['lifecycle_environment', 'content_view'],
                                       resource_type='repositories'),
             content_view=dict(type='entity', scope=['organization'], optional_scope=['lifecycle_environment']),
-            activation_keys=dict(),
+            activation_keys=dict(no_log=False),
         )
         foreman_spec.update(kwargs.pop('foreman_spec', {}))
         required_plugins = kwargs.pop('required_plugins', []) + [
@@ -786,6 +787,45 @@ class ForemanAnsibleModule(AnsibleModule):
 
     def find_puppetclasses(self, names, **kwargs):
         return [self.find_puppetclass(name, **kwargs) for name in names]
+
+    def find_cluster(self, name, compute_resource):
+        cluster = self.find_compute_resource_parts('clusters', name, compute_resource, None, ['ovirt', 'vmware'])
+
+        # workaround for https://projects.theforeman.org/issues/31874
+        if compute_resource['provider'].lower() == 'vmware':
+            cluster['_api_identifier'] = cluster['name']
+        else:
+            cluster['_api_identifier'] = cluster['id']
+
+        return cluster
+
+    def find_network(self, name, compute_resource, cluster=None):
+        return self.find_compute_resource_parts('networks', name, compute_resource, cluster, ['ovirt', 'vmware', 'google', 'azurerm'])
+
+    def find_storage_domain(self, name, compute_resource, cluster=None):
+        return self.find_compute_resource_parts('storage_domains', name, compute_resource, cluster, ['ovirt', 'vmware'])
+
+    def find_storage_pod(self, name, compute_resource, cluster=None):
+        return self.find_compute_resource_parts('storage_pods', name, compute_resource, cluster, ['vmware'])
+
+    def find_compute_resource_parts(self, part_name, name, compute_resource, cluster=None, supported_crs=None):
+        if supported_crs is None:
+            supported_crs = []
+
+        if compute_resource['provider'].lower() not in supported_crs:
+            return {'id': name, 'name': name}
+
+        additional_params = {'id': compute_resource['id']}
+        if cluster is not None:
+            additional_params['cluster_id'] = cluster['_api_identifier']
+        api_name = 'available_{0}'.format(part_name)
+        available_parts = self.resource_action('compute_resources', api_name, params=additional_params,
+                                               ignore_check_mode=True, record_change=False)['results']
+        part = next((part for part in available_parts if part['name'] == name or part['id'] == name), None)
+        if part is None:
+            err_msg = "Could not find {0} '{1}' on compute resource '{2}'.".format(part_name, name, compute_resource.get('name'))
+            self.fail_json(msg=err_msg)
+        return part
 
     def scope_for(self, key, scoped_resource=None):
         # workaround for https://projects.theforeman.org/issues/31714
@@ -1309,7 +1349,10 @@ class ForemanInfoAnsibleModule(ForemanStatelessEntityAnsibleModule):
             location=dict(type='entity'),
         )
         foreman_spec.update(kwargs.pop('foreman_spec', {}))
-        super(ForemanInfoAnsibleModule, self).__init__(foreman_spec=foreman_spec, **kwargs)
+        mutually_exclusive = kwargs.pop('mutually_exclusive', [])
+        if not foreman_spec['name'].get('invisible', False):
+            mutually_exclusive.extend([['name', 'search']])
+        super(ForemanInfoAnsibleModule, self).__init__(foreman_spec=foreman_spec, mutually_exclusive=mutually_exclusive, **kwargs)
 
     def run(self, **kwargs):
         """
@@ -1323,7 +1366,7 @@ class ForemanInfoAnsibleModule(ForemanStatelessEntityAnsibleModule):
             self._info_result = {self.entity_name: self.lookup_entity('entity')}
         else:
             _flat_entity = _flatten_entity(self.foreman_params, self.foreman_spec)
-            self._info_result = {resource: self.list_resource(resource, self.foreman_params['search'], _flat_entity)}
+            self._info_result = {resource: self.list_resource(resource, self.foreman_params.get('search'), _flat_entity)}
 
     def exit_json(self, **kwargs):
         kwargs.update(self._info_result)
@@ -1791,7 +1834,7 @@ interfaces_spec = dict(
     provision=dict(type='bool'),
     username=dict(),
     password=dict(no_log=True),
-    provider=dict(choices=['IPMI', 'SSH']),
+    provider=dict(choices=['IPMI', 'Redfish', 'SSH']),
     virtual=dict(type='bool'),
     tag=dict(),
     mtu=dict(type='int'),

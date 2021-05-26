@@ -6,6 +6,90 @@ theforeman.foreman Release Notes
 
 This changelog describes changes after version 0.8.1.
 
+v2.1.0
+======
+
+Minor Changes
+-------------
+
+- Add a domain_info module
+- Add a hostgroups role (https://github.com/theforeman/foreman-ansible-modules/issues/1116)
+- Add a role `content_rhel` to perform basic setup for registering and syncing RHEL content hosts
+- Add content credentials role
+- callback plugin - collect facts during the run, merge them correctly and upload them once at the end
+- compute_resource - add ``cloud`` param for the AzureRm provider, to select which Azure cloud to use
+- compute_resource - add ``sub_id`` parameter for handling the Azure Subscription ID instead of the ``user`` parameter
+- host - Add ``Redfish`` to list of possible BMC providers of an interface
+- host, compute_profile - look up the correct id for storage pods and domains given as part of ``volumes_attributes`` (https://bugzilla.redhat.com/show_bug.cgi?id=1885234)
+- hostgroup - add a ``ansible_roles`` parameter (https://github.com/theforeman/foreman-ansible-modules/issues/1123)
+- new ``content_views`` role to manage content views (https://github.com/theforeman/foreman-ansible-modules/issues/1111)
+- new ``organizations`` role to manage organizations (https://github.com/theforeman/foreman-ansible-modules/issues/1109)
+- subnet - add ``bmc_proxy`` parameter to configure BMC proxies for subnets
+
+Bugfixes
+--------
+
+- host - pass the right image id to the compute resource when creating a host (https://github.com/theforeman/foreman-ansible-modules/issues/1160, https://bugzilla.redhat.com/show_bug.cgi?id=1911670)
+
+New Modules
+-----------
+
+- theforeman.foreman.content_view_info - Fetch information about Content Views
+- theforeman.foreman.content_view_version_info - Fetch information about Content Views
+- theforeman.foreman.domain_info - Fetch information about Domains
+- theforeman.foreman.host_errata_info - Fetch information about Host Errata
+- theforeman.foreman.repository_set_info - Fetch information about Red Hat Repositories
+- theforeman.foreman.setting_info - Fetch information about Settings
+- theforeman.foreman.subnet_info - Fetch information about Subnets
+- theforeman.foreman.subscription_info - Fetch information about Subscriptions
+
+v2.0.1
+======
+
+Bugfixes
+--------
+
+- host - don't filter ``false`` values for ``interfaces_attributes`` (https://github.com/theforeman/foreman-ansible-modules/issues/1148)
+- host_info, repository_info - correctly fetch all entities when neither ``name`` nor ``search`` is set
+- host_info, repository_info - enforce mutual exclusivity of ``name`` and ``search``
+
+v2.0.0
+======
+
+Minor Changes
+-------------
+
+- Add a role `activation_keys` to manage activation keys
+- Add a role `lifecycle_environments` to manage lifecycle environments
+- Add a role `repositories` to manage products, repositories, and repository_sets
+- Add a role `sync_plans` to manage sync plans
+- activation_key - add support for selecting subscriptions by ``upstream_pool_id``
+- compute_resource - add ``set_console_password``, ``keyboard_layout`` and ``public_key`` parameters (https://github.com/theforeman/foreman-ansible-modules/issues/1052)
+- host - clarify that ``owner`` refers to a users login, not their full name (https://github.com/theforeman/foreman-ansible-modules/issues/1045)
+- host - look up the correct network id for a network given as part of ``interfaces_attributes`` (https://github.com/theforeman/foreman-ansible-modules/issues/1104)
+- host, hostgroup - add ``activation_keys`` parameter to ease configuring activation keys for deploments
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- All role variables are now prefixed with ``foreman_`` to avoid clashes with similarly named variables from roles outside this collection.
+
+Bugfixes
+--------
+
+- content_view_version - make the ``version`` parameter not fail when the version was entered without a minor part (https://github.com/theforeman/foreman-ansible-modules/issues/1087)
+- host - allow moving hosts between Organizations and Locations (https://bugzilla.redhat.com/show_bug.cgi?id=1901716)
+- host - fix subnet/domain assignment when multiple interfaces are defined (https://github.com/theforeman/foreman-ansible-modules/issues/1095)
+- host, hostgroup - select kickstart_repository based on lifecycle_environment and content_view if those are set (https://github.com/theforeman/foreman-ansible-modules/issues/1090, https://bugzilla.redhat.com/1915872)
+- resource_info - correctly show the exact resource when passing ``id`` in ``params``
+
+New Modules
+-----------
+
+- theforeman.foreman.host_info - Fetch information about Hosts
+- theforeman.foreman.puppetclasses_import - Import Puppet Classes from a Proxy
+- theforeman.foreman.repository_info - Fetch information about Repositories
+
 v1.5.0
 ======
 

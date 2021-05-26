@@ -25,7 +25,7 @@ module: repository
 version_added: 1.0.0
 short_description: Manage Repositories
 description:
-  - Crate and manage repositories
+  - Create and manage repositories
 author: "Eric D Helms (@ehelms)"
 notes:
   - You can configure certain aspects of existing Red Hat Repositories (like I(download_policy)) using this module,
@@ -271,10 +271,10 @@ def main():
             ignore_global_proxy=dict(type='bool'),
             http_proxy_policy=dict(choices=['global_default_http_proxy', 'none', 'use_selected_http_proxy']),
             http_proxy=dict(type='entity'),
-            gpg_key=dict(type='entity', resource_type='content_credentials', scope=['organization']),
+            gpg_key=dict(type='entity', resource_type='content_credentials', scope=['organization'], no_log=False),
             ssl_ca_cert=dict(type='entity', resource_type='content_credentials', scope=['organization']),
             ssl_client_cert=dict(type='entity', resource_type='content_credentials', scope=['organization']),
-            ssl_client_key=dict(type='entity', resource_type='content_credentials', scope=['organization']),
+            ssl_client_key=dict(type='entity', resource_type='content_credentials', scope=['organization'], no_log=False),
             download_policy=dict(choices=['background', 'immediate', 'on_demand']),
             mirror_on_sync=dict(type='bool', default=True),
             verify_ssl_on_sync=dict(type='bool'),
