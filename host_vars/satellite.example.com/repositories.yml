@@ -1,5 +1,5 @@
 ---
-products:
+foreman_products:
   - name: Community Enterprise OS 7
     repositories:
       - name: CentOS-7 - Base RPMs x86_64
