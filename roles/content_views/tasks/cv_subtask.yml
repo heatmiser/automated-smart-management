@@ -8,7 +8,8 @@
     content_view: "{{ item.content_view }}"
     organization: "{{ foreman_organization }}"
     version: "{{ item.content_view_update | d(false) | ternary(omit, 1.0) }}"
-    lifecycle_environments: "{{ item.lifecycle_environments | first }}"
+    #lifecycle_environments: "{{ item.lifecycle_environments | first }}"
+    lifecycle_environments: "{{ item.lifecycle_environments }}"
   async: "{{ publish_timeout }}"
   poll: 0
   register: publish_async
