@@ -5,4 +5,6 @@ collections:
   - ansible.tower
   - amazon.aws
   - redhat_cop.tower_configuration
-  #https://github.com/theforeman/foreman-ansible-modules
+  - name: https://github.com/theforeman/foreman-ansible-modules.git
+    type: git
+    version: 2.1.0  
