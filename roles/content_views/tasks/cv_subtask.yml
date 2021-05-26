@@ -1,12 +1,12 @@
 ---
 - name: "Publish lifecyle environments for content view {{ item.content_view }}"
   theforeman.foreman.content_view_version:
-    username: "{{ username | default(omit) }}"
-    password: "{{ password | default(omit) }}"
-    server_url: "{{ server_url | default(omit) }}"
-    validate_certs: "{{ validate_certs | default(omit) }}"
+    username: "{{ foreman_username | default(omit) }}"
+    password: "{{ foreman_password | default(omit) }}"
+    server_url: "{{ foreman_server_url | default(omit) }}"
+    validate_certs: "{{ foreman_validate_certs | default(omit) }}"
     content_view: "{{ item.content_view }}"
-    organization: "{{ organization }}"
+    organization: "{{ foreman_organization }}"
     version: "{{ item.content_view_update | d(false) | ternary(omit, 1.0) }}"
     lifecycle_environments: "{{ item.lifecycle_environments | first }}"
   async: "{{ publish_timeout }}"
