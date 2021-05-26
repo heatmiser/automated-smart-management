@@ -1,10 +1,4 @@
 ---
-- name: create content views
-  include_tasks: '_create_content_view.yml'
-  with_items: "{{ foreman_content_views }}"
-  loop_control:
-    loop_var: content
-
 - name: "Publish lifecyle environments for content view"
   include: cv_subtask.yml
   loop: "{{ foreman_content_views }}"
