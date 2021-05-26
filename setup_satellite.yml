@@ -57,7 +57,8 @@
     satellite_infra_workloads:
       - theforeman.foreman.repositories
       - theforeman.foreman.lifecycle_environments
-      - content_views
+      - theforeman.foreman.content_views
+      #- content_views
       - theforeman.foreman.activation_keys
 
   tasks:
