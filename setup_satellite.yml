@@ -58,7 +58,7 @@
       - theforeman.foreman.repositories
       - theforeman.foreman.lifecycle_environments
       - theforeman.foreman.content_views
-      #- content_views
+      - content_views
       - theforeman.foreman.activation_keys
 
   tasks:
