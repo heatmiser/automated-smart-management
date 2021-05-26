@@ -1,12 +1,10 @@
 ---
 collections:
-  ## project local collections
-  #- redhat.satellite
-  #- redhat.insights
-  #- ansible.tower
-  #- amazon.aws
-  #- redhat_cop.tower_configuration
-  ## git sourced collections
+  - redhat.satellite
+  - redhat.insights
+  - ansible.tower
+  - amazon.aws
+  - redhat_cop.tower_configuration
   - name: https://github.com/theforeman/foreman-ansible-modules.git
     type: git
     version: 2.1.0  
