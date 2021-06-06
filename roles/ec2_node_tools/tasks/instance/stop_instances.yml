@@ -17,11 +17,3 @@
   delegate_to: localhost
   connection: local
   with_items: "{{ instances_details.instances|map(attribute='private_ip_address')|list|unique }}"
-  when: "'Windows' not in ansible_distribution"
-
-- name: ensure host is down via WinRM port probe 
-  wait_for: "port=5986 host={{ item }} delay=10 state=stopped timeout=60"
-  delegate_to: localhost
-  connection: local
-  with_items: "{{ instances_details.instances|map(attribute='private_ip_address')|list|unique }}"
-  when: "'Windows' in ansible_distribution"
