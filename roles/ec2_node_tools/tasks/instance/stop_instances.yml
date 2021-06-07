@@ -22,7 +22,8 @@
   connection: local
   with_together:
     - "{{ instances_details.instances|map(attribute='private_ip_address')|list|unique }}"
-    - "{{ instance_platform }}"
+    - "{{ instances_details | json_query('instances[*].platform') }}"
+#   - "{{ instance_platform }}"
   when:
     - item.1 == None
 
@@ -32,6 +33,7 @@
   connection: local
   with_together:
     - "{{ instances_details.instances|map(attribute='private_ip_address')|list|unique }}"
-    - "{{ instance_platform }}"
+    - "{{ instances_details | json_query('instances[*].platform') }}"
+#   - "{{ instance_platform }}"
   when:
     - item.1 == 'windows'
