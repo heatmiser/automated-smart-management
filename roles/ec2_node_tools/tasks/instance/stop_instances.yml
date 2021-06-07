@@ -1,7 +1,7 @@
 ---
 - name: Generate platform (or lack of) list
   set_fact:
-    instance_platform: "{{ instances_details.instances|map(attribute='platform')|list }}"
+    instance_platform: "{{ instances_details | json_query('instances[*].platform') }}"
 
 - name: Stop instances
   ec2_instance:
